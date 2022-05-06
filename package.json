@@ -1,0 +1,18 @@
+{
+  "name": "unplugin-vue-routes",
+  "version": "0.0.0",
+  "description": "> convention vue routes",
+  "main": "index.js",
+  "directories": {
+    "example": "examples"
+  },
+  "repository": "yuler/vue-convention-routes",
+  "scripts": {
+    "test": "vitest"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^17.0.31",
+    "vitest": "^0.10.5"
+  }
+}

@@ -1,0 +1,14 @@
+# Mac
+.DS_Store
+
+# Node.js
+node_modules
+dist
+
+# Editor
+.vscode
+.idea
+
+# Logs
+*.log
+*.logs
