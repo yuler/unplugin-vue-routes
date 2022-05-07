@@ -1,4 +1,4 @@
-import path, {format, normalize} from 'node:path'
+import path from 'node:path'
 import fg from 'fast-glob'
 import {leadingSlash, pascalize} from './utils'
 
@@ -18,13 +18,15 @@ export function generateRoutes(pages: string) {
 
   for (const file of files) {
     const route = resolveRoute(file)
-    routes.push(`
-    {
-      path: '${route.path}',
-      name: '${route.name}',
-      component: () => import('${route.componentImport}'),
-    }
-    `)
+    routes.push(
+      `
+  {
+    path: '${route.path}',
+    name: '${route.name}',
+    component: () => import('${route.componentImport}'),
+  }
+`.trim(),
+    )
   }
 
   return template(routes)
@@ -35,35 +37,46 @@ function template(routes: string[]): string {
 import type {RouteRecordRaw} from 'vue-router'
 
 const routes: RouteRecordRaw[] = [
-  ${routes.join(',')}
+  ${routes.join(',\n  ')}
 ]
 
 export default routes
-
 `.trimStart()
 }
 
-function resolveRoute(file: string) {
-  // const _path = leadingSlash(file)
+function resolveRoute(filepath: string) {
+  const extname = path.extname(filepath)
+  const segments = filepath.slice(0, -extname.length).split(path.sep)
 
-  const segments = file.split(path.delimiter)
-  const extname = path.extname(file)
-  const dirname = path.dirname(file)
-  const filename = path.basename(file, extname)
+  // Resolve route path.
+  const paths: string[] = []
+  const names: string[] = []
+  for (let segment of segments) {
+    segment = segment.toLowerCase()
+    let path_ = segment
+    let name = segment
+    if (segment === 'index') {
+      name = ''
+      path_ = ''
+    } else if (/^\[\[(.*)\]\]$/.test(segment)) {
+      name = segment.slice(2, -2)
+      path_ = `:${name}?`
+    } else if (/^\[(.*)\]$/.test(segment)) {
+      name = segment.slice(1, -1)
+      path_ = `:${name}`
+    } else if (/^\[\.\.\.(.*)\]\]$/.test(segment)) {
+      name = segment.slice(4, -1)
+      path_ = `:${name}*`
+    }
 
-  if (filename.toUpperCase() === 'index') {
-    // filename = '/'
-  } else if (filename.startsWith('$')) {
-    // filename = `:${filename.slice(1)}`
+    names.push(name)
+    paths.push(path_)
   }
 
-  const path_ = leadingSlash(path.join(dirname, filename).toLowerCase())
-  const name = path.join(dirname)
-
   const route: Route = {
-    path: path_,
-    name: pascalize(path_.split('/').join('-')),
-    componentImport: `@/pages/${file}`,
+    path: leadingSlash(paths.join('/')),
+    name: pascalize(names.join('-')),
+    componentImport: `@/pages/${filepath}`,
   }
 
   return route
