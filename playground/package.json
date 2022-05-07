@@ -1,9 +1,7 @@
 {
-  "name": "@examples/vite",
-  "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "vite"
+    "dev": "nodemon -w '../src/**/*.ts' -e .ts -x 'vite'"
   },
   "dependencies": {
     "vue": "^3.2.33",
@@ -11,6 +9,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^2.3.2",
-    "unplugin-vue-routes": "workspace:*"
+    "vite": "^2.9.2",
+    "vite-plugin-inspect": "^0.4.3"
   }
 }
