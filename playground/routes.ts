@@ -9,8 +9,8 @@ const routes: RouteRecordRaw[] = [
     }
     ,
     {
-      path: '/profile/:id',
-      name: 'Profile-:id',
+      path: '/profile/$id',
+      name: 'Profile-$id',
       component: () => import('@/pages/profile/$id.vue'),
     }
     

@@ -11,6 +11,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^2.3.2",
-    "unplugin-vue-routes": "workspace:*"
+    "unplugin-vue-routes": "workspace:*",
+    "vite": "^2.9.8"
   }
 }

@@ -1,6 +1,7 @@
 {
   "name": "unplugin-vue-routes",
   "version": "0.0.0",
+  "packageManager": "pnpm@7.0.1",
   "description": "> convention vue routes",
   "repository": "yuler/unplugin-vue-routes",
   "main": "dist/index.js",
@@ -44,12 +45,6 @@
     "tsup": "^5.12.7",
     "typescript": "^4.6.4",
     "vite": "^2.9.8",
-    "vite-plugin-inspect": "^0.5.0",
-    "vitest": "^0.10.5",
-    "vue": "^3.2.33"
-  },
-  "peerDependencies": {
-    "vue": "^3.2.33",
-    "vue-router": "^4.0.15"
+    "vitest": "^0.10.5"
   }
 }
