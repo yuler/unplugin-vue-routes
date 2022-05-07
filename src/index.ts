@@ -1,1 +1,12 @@
-console.log('unplugin-vue-routes')
+import {createUnplugin} from 'unplugin'
+import type {Options} from './types'
+
+export default createUnplugin<Options>(options => ({
+  name: 'unplugin-vue-routes',
+  transformInclude(id) {
+    return id.endsWith('main.ts')
+  },
+  transform(code) {
+    return code.replace('__UNPLUGIN__', `Hello Unplugin! ${options}`)
+  },
+}))

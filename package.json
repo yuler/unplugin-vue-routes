@@ -2,17 +2,39 @@
   "name": "unplugin-vue-routes",
   "version": "0.0.0",
   "description": "> convention vue routes",
-  "main": "index.js",
-  "directories": {
-    "example": "examples"
+  "repository": "yuler/unplugin-vue-routes",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./vite": {
+      "require": "./dist/vite.js",
+      "import": "./dist/vite.mjs",
+      "types": "./dist/vite.d.ts"
+    },
+    "./webpack": {
+      "require": "./dist/webpack.js",
+      "import": "./dist/webpack.mjs",
+      "types": "./dist/webpack.d.ts"
+    },
+    "./*": "./*"
   },
-  "repository": "yuler/vue-convention-routes",
   "scripts": {
     "test": "vitest"
   },
-  "dependencies": {},
+  "dependencies": {
+    "unplugin": "^0.6.2"
+  },
   "devDependencies": {
     "@types/node": "^17.0.31",
     "vitest": "^0.10.5"
-  }
+  },
+  "workspaces": [
+    "examples/vite"
+  ]
 }
