@@ -22,11 +22,11 @@ export default createUnplugin<Options>((options = {}) => {
   const exclude = [/[\\/]node_modules[\\/]/, /[\\/]\.git[\\/]/]
   const filter = createFilter(include, exclude)
 
-  const generateRoutesFile = throttle(() => {
+  const generateRoutesFile = throttle(async () => {
     console.log('Write routes file...')
     fs.writeFileSync(
       resolvedOptions.output,
-      generateRoutes(resolvedOptions.pages),
+      await generateRoutes(resolvedOptions.pages),
       'utf-8',
     )
   }, 500)
@@ -55,6 +55,9 @@ export default createUnplugin<Options>((options = {}) => {
             generateRoutesFile()
           })
           watcher.on('add', _ => {
+            generateRoutesFile()
+          })
+          watcher.on('change', _ => {
             generateRoutesFile()
           })
         }

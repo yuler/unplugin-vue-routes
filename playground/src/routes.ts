@@ -5,6 +5,7 @@ const routes: RouteRecordRaw[] = [
     path: '/home',
     name: 'Home',
     component: () => import('@/pages/home.vue'),
+    meta: {title: '首页', requiresAuth: true},
   },
   {
     path: '/me',
@@ -15,7 +16,7 @@ const routes: RouteRecordRaw[] = [
     path: '/profile/:id',
     name: 'ProfileId',
     component: () => import('@/pages/profile/[id].vue'),
-  }
+  },
 ]
 
 export default routes

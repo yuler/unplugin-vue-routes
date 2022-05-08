@@ -1,0 +1,18 @@
+{
+  // refs: https://github.com/johnsoncodehk/volar/blob/master/extensions/vscode-vue-language-features/templates/vue.code-snippets
+  "route": {
+    "scope": "vue",
+    "prefix": "route",
+    "body": [
+      "<route lang=\"json\">",
+      "{",
+      "  \"name\": \"home\",",
+      "  \"meta\": {",
+      "    \"requiresAuth\": true",
+      "  }",
+      "}",
+      "</route>"
+    ],
+    "description": "Setup route config"
+  }
+}

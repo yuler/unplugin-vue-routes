@@ -1,8 +1,11 @@
+import fs from 'node:fs'
 import path from 'node:path'
 import fg from 'fast-glob'
+import prettier from 'prettier'
 import {leadingSlash, pascalize} from './utils'
+import {parseSFC} from './parseSFC'
 
-export function generateRoutes(pages: string) {
+export async function generateRoutes(pages: string) {
   // `Style`: `nested`
   const patterns = ['**/*.vue']
 
@@ -17,34 +20,43 @@ export function generateRoutes(pages: string) {
   const routes: string[] = []
 
   for (const file of files) {
-    const route = resolveRoute(file)
-    routes.push(
-      `
-  {
-    path: '${route.path}',
-    name: '${route.name}',
-    component: () => import('${route.componentImport}'),
-  }
-`.trim(),
-    )
+    const route = resolveRoute(pages, file)
+    let code = `{\n`
+
+    for (const [key, value] of Object.entries(route)) {
+      code += `${key}: ${key === 'component' ? value : JSON.stringify(value)},`
+    }
+
+    code += `\n}`
+
+    routes.push(code)
   }
 
   return template(routes)
 }
 
-function template(routes: string[]): string {
-  return `
-import type {RouteRecordRaw} from 'vue-router'
+async function template(routes: string[]) {
+  let options
+  // Try load prettier config
+  try {
+    const configFile = await prettier.resolveConfigFile()
+    options = (await prettier.resolveConfig(configFile!)) || {}
+  } catch {}
 
-const routes: RouteRecordRaw[] = [
-  ${routes.join(',\n  ')}
-]
+  return prettier.format(
+    `
+    import type {RouteRecordRaw} from 'vue-router'
 
-export default routes
-`.trimStart()
+    const routes: RouteRecordRaw[] = [
+      ${routes.join(',\n  ')}
+    ]
+
+    export default routes`,
+    options,
+  )
 }
 
-function resolveRoute(filepath: string) {
+function resolveRoute(pages: string, filepath: string) {
   const extname = path.extname(filepath)
   const segments = filepath.slice(0, -extname.length).split(path.sep)
 
@@ -73,10 +85,23 @@ function resolveRoute(filepath: string) {
     paths.push(path_)
   }
 
+  // Resolve `<route>` in SFC
+  const content = fs.readFileSync(path.resolve(pages, filepath), 'utf-8')
+  const parsed = parseSFC(content)
+
+  const routeBlock = parsed.customBlocks.find(block => block.type === 'route')
+
+  // TODO: refs https://github.com/ktsn/vue-route-generator/blob/master/src/resolve.ts#L49-L56
+  let routeConfig = {}
+  if (routeBlock) {
+    routeConfig = JSON.parse(routeBlock.content)
+  }
+
   const route: Route = {
     path: leadingSlash(paths.join('/')),
     name: pascalize(names.join('-')),
-    componentImport: `@/pages/${filepath}`,
+    component: `() => import('@/pages/${filepath}')`,
+    ...routeConfig,
   }
 
   return route
@@ -85,7 +110,7 @@ function resolveRoute(filepath: string) {
 interface Route {
   path: string
   name: string
-  componentImport: string
+  component: string
   redirect?: string
   alias?: string
   props?: object
