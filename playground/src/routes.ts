@@ -1,21 +1,25 @@
 import type {RouteRecordRaw} from 'vue-router'
 
 const routes: RouteRecordRaw[] = [
+  {name: 'home', path: '/home', component: () => import('@/pages/home.vue')},
+  {name: 'index', path: '/', component: () => import('@/pages/index.vue')},
   {
-    path: '/home',
-    name: 'Home',
-    component: () => import('@/pages/home.vue'),
-    meta: {title: '首页', requiresAuth: true},
+    name: 'layout',
+    path: '/layout',
+    component: () => import('@/pages/layout.vue'),
   },
+  {name: 'me', path: '/me', component: () => import('@/pages/me.vue')},
   {
-    path: '/me',
-    name: 'Me',
-    component: () => import('@/pages/me.vue'),
-  },
-  {
-    path: '/profile/:id',
-    name: 'ProfileId',
-    component: () => import('@/pages/profile/[id].vue'),
+    name: 'profile',
+    path: '/profile',
+    component: () => import('@/pages/profile.vue'),
+    children: [
+      {
+        name: 'profile-id',
+        path: ':id',
+        component: () => import('@/pages/profile/[id].vue'),
+      },
+    ],
   },
 ]
 

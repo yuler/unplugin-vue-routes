@@ -3,14 +3,28 @@
  */
 export interface Options {
   /**
-   * The pages directory. Default is `src/pages`
+   * Relative path to the pages directory.
+   *
+   * @default 'src/pages'
    */
   pages?: string
 
   /**
-   * The routes output file. Default is `src/router/routes.ts`
+   * List of valid pages file extensions.
+   *
+   * @default ['vue', 'ts', 'js']
+   */
+  extensions?: string[]
+
+  /**
+   * The glob patterns for ignore match.
+   */
+  ignore?: string[]
+
+  /**
+   * The routes code output.
    */
   output?: string
 }
 
-export interface ResolvedOptions extends Required<Options> {}
+export type ResolvedOptions = Required<Options>

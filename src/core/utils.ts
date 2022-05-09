@@ -1,3 +1,9 @@
+import Debug from 'debug'
+
+export const debug = {
+  options: Debug('unplugin-vue-pages:options'),
+}
+
 export const capitalize = (str: string) => {
   return str.charAt(0).toUpperCase() + str.slice(1)
 }

@@ -1,66 +1,31 @@
-import fs from 'node:fs'
 import {createUnplugin} from 'unplugin'
-import {createFilter} from '@rollup/pluginutils'
+import type {Options} from './types'
 import chokidar from 'chokidar'
-import type {Options, ResolvedOptions} from './types'
-import {generateRoutes} from './core/routes'
-import {throttle} from './core/utils'
+import {PageContext} from './core/context'
 
-export default createUnplugin<Options>((options = {}) => {
-  // TODO: options.pages
-  const defaultOptions = {
-    pages: 'src/pages',
-    output: 'src/router/routes.ts',
-  }
-
-  const resolvedOptions: ResolvedOptions = {
-    ...defaultOptions,
-    ...options,
-  }
-
-  const include = [/\.vue$/, /\.vue\?vue/]
-  const exclude = [/[\\/]node_modules[\\/]/, /[\\/]\.git[\\/]/]
-  const filter = createFilter(include, exclude)
-
-  const generateRoutesFile = throttle(async () => {
-    console.log('Write routes file...')
-    fs.writeFileSync(
-      resolvedOptions.output,
-      await generateRoutes(resolvedOptions.pages),
-      'utf-8',
-    )
-  }, 500)
+export default createUnplugin<Options>(options => {
+  const ctx = new PageContext(options)
 
   return {
     name: 'unplugin-vue-routes',
-    enforce: 'post',
+    enforce: 'pre',
+
     transformInclude(id) {
-      return filter(id)
+      return ctx.glob().includes(id)
     },
-    // transform(code, id) {
-    //   console.log(code, id)
-    //   return null
-    // },
+
+    transform(code, id) {
+      ctx.generateRoutes()
+      return null
+    },
 
     vite: {
       configResolved(config) {
-        generateRoutesFile()
-
-        if (
-          config.command === 'serve' ||
-          (config.command === 'build' && config.build.watch)
-        ) {
-          const watcher = chokidar.watch(resolvedOptions.pages)
-          watcher.on('unlink', _ => {
-            generateRoutesFile()
-          })
-          watcher.on('add', _ => {
-            generateRoutesFile()
-          })
-          watcher.on('change', _ => {
-            generateRoutesFile()
-          })
-        }
+        if (config.build.watch && config.command === 'build')
+          ctx.setupWatcher(chokidar.watch(ctx.glob()))
+      },
+      configureServer(server) {
+        ctx.setupViteServer(server)
       },
     },
   }
